@@ -1,0 +1,134 @@
+/* General form styling */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 350px;
+    padding: 20px;
+    border-radius: 20px;
+    background-color: #1a1a1a;
+    color: #fff;
+    border: 1px solid #333;
+}
+
+/* Title styling */
+.title {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -1px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding-left: 30px;
+    color: #00bfff;
+}
+
+.title::before {
+    width: 18px;
+    height: 18px;
+    background-color: #00bfff;
+    border-radius: 50%;
+    position: absolute;
+    left: 0;
+    content: "";
+}
+
+.title::after {
+    width: 18px;
+    height: 18px;
+    background-color: #00bfff;
+    border-radius: 50%;
+    position: absolute;
+    left: 0;
+    content: "";
+    animation: pulse 1s linear infinite;
+}
+
+@keyframes pulse {
+    from {
+        transform: scale(0.9);
+        opacity: 1;
+    }
+    to {
+        transform: scale(1.8);
+        opacity: 0;
+    }
+}
+
+/* Styling for messages and links */
+.message, .signin {
+    font-size: 14.5px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.signin {
+    text-align: center;
+}
+
+.signin a {
+    color: #00bfff;
+}
+
+.signin a:hover {
+    text-decoration: underline royalblue;
+}
+
+/* Flex container */
+.flex {
+    display: flex;
+    width: 100%;
+    gap: 6px;
+}
+
+/* Form label styling */
+.form label {
+    position: relative;
+}
+
+/* Input styling */
+.input {
+    background-color: #333;
+    color: #fff;
+    width: 100%;
+    padding: 20px 5px 5px 10px;
+    outline: none;
+    border: 1px solid rgba(105, 105, 105, 0.4);
+    border-radius: 10px;
+    font-size: medium;
+}
+
+/* Floating label styling */
+.input + span {
+    color: rgba(255, 255, 255, 0.5);
+    position: absolute;
+    left: 10px;
+    top: 0;
+    font-size: 0.9em;
+    cursor: text;
+    transition: 0.3s ease;
+}
+
+/* Focused input styling */
+.input:focus + span,
+.input:valid + span {
+    color: #00bfff;
+    top: 0;
+    font-size: 0.7em;
+    font-weight: 600;
+}
+
+/* Submit button styling */
+.submit {
+    border: none;
+    outline: none;
+    padding: 10px;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 16px;
+    transition: 0.3s ease;
+    background-color: #00bfff;
+}
+
+.submit:hover {
+    background-color: #00bfff96;
+}
