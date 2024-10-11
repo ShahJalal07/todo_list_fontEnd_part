@@ -5,6 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { registrationRequest } from "../API/API";
 import { toast } from "react-toastify";
 
+
+
 const RegistrationCom = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -14,6 +16,14 @@ const RegistrationCom = () => {
     password: "",
     confirmPassword: "",
   });
+
+  // when page change reload the page
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  })
+  
+
+  
 
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();

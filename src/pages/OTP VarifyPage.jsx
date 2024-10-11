@@ -8,10 +8,8 @@ const OTPVarifyCom = lazy(() => import('../components/OTP VarifyCom'))
 const OTPVarifyPage = () => {
   return (
     <Suspense fallback={<Loader />}>
-      <MainLayOut>
-        
+      
       <OTPVarifyCom />
-      </MainLayOut>
     </Suspense>
   )
 }

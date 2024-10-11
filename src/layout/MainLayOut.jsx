@@ -5,6 +5,7 @@ import { FiSearch } from "react-icons/fi";
 import { Link, NavLink } from "react-router-dom";
 import { FaHome } from "react-icons/fa";
 import { IoIosCreate } from "react-icons/io";
+import { getUserDetails, logOut } from "../helper/SessionHelper";
 const MainLayOut = (props) => {
   const [show, setShow] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -67,7 +68,7 @@ const MainLayOut = (props) => {
           <div onClick={() => setShow(!show)} className="cursor-pointer">
             <div className="w-10 h-10 overflow-hidden bg-gray-300 rounded-full">
               <img
-                src="path_to_your_profile_image.jpg"
+                src={getUserDetails()?.photo}
                 alt="Profile"
                 className="object-cover w-full h-full"
               />
@@ -82,18 +83,27 @@ const MainLayOut = (props) => {
               />
               <div className="w-24 h-24 mx-auto mb-4 overflow-hidden rounded-full bg-primary">
                 <img
-                  src="path_to_your_profile_image.jpg"
+                  src={getUserDetails()?.photo}
                   alt="Profile"
                   className="object-cover w-full h-full"
                 />
               </div>
-              <h1 className="mb-4 text-xl font-bold text-white">John Doe</h1>
+              <h1 className="mb-4 text-xl font-bold text-white">
+                <span>{getUserDetails()?.firstName}</span>{" "}
+                <span>{getUserDetails()?.lastName}</span>
+              </h1>
               <div className="mb-2">
-                <Link to="/profileDetails" className="w-full text-center block py-2 font-semibold text-white bg-gray-700 rounded-lg hover:opacity-90">
+                <Link
+                  to="/profileDetails"
+                  className="block w-full py-2 font-semibold text-center text-white bg-gray-700 rounded-lg hover:opacity-90"
+                >
                   Profile View
                 </Link>
               </div>
-              <button className="w-full py-2 font-semibold text-white bg-red-500 rounded-lg hover:opacity-90">
+              <button
+                onClick={() => logOut()}
+                className="w-full py-2 font-semibold text-white bg-red-500 rounded-lg hover:opacity-90"
+              >
                 Log Out
               </button>
             </div>
@@ -135,9 +145,6 @@ const MainLayOut = (props) => {
               >
                 <IoIosCreate />
               </NavLink>
-
-                
-
             </div>
           ) : (
             <div className="transition-all duration-100 ease-in-out">
@@ -218,8 +225,16 @@ const MainLayOut = (props) => {
                 new Status
               </NavLink>
 
-              
-
+              <NavLink
+                to="/profileEdit"
+                className={({ isActive }) =>
+                  isActive
+                    ? "py-2 my-[5px] transition-all duration-100 block ease-in-out px-2 w-[100%] font-semibold text-white capitalize bg-[#374151] rounded-lg"
+                    : "py-2 my-[5px] transition-all duration-100 block ease-in-out px-2 w-[100%] font-semibold text-white capitalize rounded-lg"
+                }
+              >
+                Settings & Edit Profile
+              </NavLink>
             </div>
           )}
         </div>

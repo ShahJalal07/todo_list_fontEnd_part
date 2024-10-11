@@ -1,13 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import "../All CSS files/LoginCSS.css";
 import { FaEyeSlash, FaEye } from "react-icons/fa6";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
+import { loginRequest } from "../API/API";
+import { toast } from "react-toastify";
 
 const LoginCom = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+  });
+
+  // when page change reload the page
+  useEffect(() => {
+    window.scrollTo(0, 0);
   });
 
   const [errors, setErrors] = useState({});
@@ -51,6 +58,7 @@ const LoginCom = () => {
 
   // Function to handle form submission
   const handleSubmit = (e) => {
+    
     e.preventDefault();
     if (Object.keys(errors).length === 0) {
       // Form is valid; perform submission actions here (e.g., API call)
@@ -59,7 +67,24 @@ const LoginCom = () => {
         password: "",
       });
       setErrors({});
-      console.log(formData);
+
+      loginRequest(formData.email, formData.password)
+        .then((result) => {
+          if (result.error === "User not found") {
+            toast.error("User not found");
+          } else if (result.error === "Wrong Password") {
+            toast.error("Wrong Password");
+          } else if (result === true) {
+            toast.success("Login successful");
+
+            setTimeout(() => {
+              window.location.href = "/";
+            }, 2000);
+          }
+        })
+        .catch((error) => {
+          toast.error("Login failed");
+        });
     }
   };
 
@@ -118,7 +143,23 @@ const LoginCom = () => {
         </button>
 
         <p className="signup">
-          Don't have an account? <Link to="/register" className='text-blue-500 font-bold text-[15px]'>SignUp</ Link>
+          <div>
+            Don't have an account?{" "}
+            <Link
+              to="/register"
+              className="text-blue-500 font-bold text-[15px]"
+            >
+              SignUp
+            </Link>
+          </div>
+          <div>
+            <Link
+              to="/forgotPassword"
+              className="text-blue-500 font-bold text-[15px]"
+            >
+              Forgot Password
+            </Link>
+          </div>
         </p>
       </form>
     </div>
@@ -126,5 +167,3 @@ const LoginCom = () => {
 };
 
 export default LoginCom;
-
-
