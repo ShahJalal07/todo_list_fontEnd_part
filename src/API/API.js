@@ -218,3 +218,39 @@ export function profileNameChange(email, firstName, lastName) {
       }
     });
 }
+
+export function changePassword(email, oldPassword, newPassword) {
+  const url = `${baseURL}/changePassword`;
+  const body = {
+    email: email,
+    password: oldPassword,
+    newPassword: newPassword,
+  };
+
+  return axios
+    .post(url, body)
+    .then((response) => {
+      if (response.status === 200) {
+        if (response.data.status === "fail") {
+          toast.error("Failed to Update Password");
+          return false;
+        } else {
+          toast.success("Password Updated Successfully");
+          return true;
+        }
+      } else {
+        toast.error("An unexpected error occurred");
+        return false;  // Added return here
+      }
+    })
+    .catch((error) => {
+      if (error.response && error.response.status === 401) {
+        toast.error("Unauthorized request");
+      } else {
+        toast.error(`Error: ${error.message}`);
+      }
+      return false;  // Added return here
+    });
+}
+
+

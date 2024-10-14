@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { profileNameChange, profileView } from "../API/API";
+import { changePassword, profileNameChange, profileView } from "../API/API";
 import { toast } from "react-toastify";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { getUserDetails, logOut } from "../helper/SessionHelper";
 
 const ProfileEditCom = () => {
   const [firstName, setFirstName] = useState("");
@@ -10,17 +11,19 @@ const ProfileEditCom = () => {
   const [email, setEmail] = useState("");
   const [profilePicture, setProfilePicture] = useState();
 
-  // Fetch profile from Redux state
+  // Fetch profile from Redux statec
   const profile = useSelector((state) => state.profile.profile);
+
+  const userEmail = getUserDetails().email;
 
   // Set profile data when profile is available from the Redux store
   useEffect(() => {
     if (profile) {
       setFirstName(profile.firstName);
       setLastName(profile.lastName);
-      setEmail(profile.email); // Keep the email as read-only
+      // Keep the email as read-only
     }
-  }, [profile]);
+  }, [profile.firstName, profile.lastName, profile.email]);
 
   // Fetch profile data on component mount (if needed from API)
   useEffect(() => {
@@ -28,12 +31,12 @@ const ProfileEditCom = () => {
   }, []);
 
   // Handle profile form submission
-
   const [oldPassword, setOldPassword] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+  const [OldpasswordVisible, setOldPasswordVisible] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const [error, setError] = useState("");
 
   const handelOldPasswordChange = (e) => {
@@ -48,6 +51,10 @@ const ProfileEditCom = () => {
     setConfirmPassword(e.target.value);
   };
 
+  const toggleOldPasswordVisibility = () => {
+    setOldPasswordVisible(!OldpasswordVisible);
+  };
+
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
   };
@@ -60,12 +67,25 @@ const ProfileEditCom = () => {
     e.preventDefault();
   };
 
-  const handleSubmit = (e) => {
+  const handlePassChange = (e) => {
     e.preventDefault();
 
-    // Validate old password is not empty
+    // Clear previous errors
+    setError("");
+
+    // Validate that all required variables exist
     if (!oldPassword) {
       setError("Old password is required.");
+      return;
+    }
+
+    if (!password) {
+      setError("New password is required.");
+      return;
+    }
+
+    if (!confirmPassword) {
+      setError("Please confirm your new password.");
       return;
     }
 
@@ -75,13 +95,26 @@ const ProfileEditCom = () => {
       return;
     }
 
-    // Validate new password complexity (example: at least 1 number, 1 uppercase letter, 1 special character)
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    if (!passwordRegex.test(password)) {
-      setError(
-        "Password must include uppercase, lowercase, number, and special character."
-      );
+    if (password.length > 50) {
+      setError("New password must be less than 50 characters.");
+      return;
+    }
+
+    // Validate new password contains only letters and numbers
+    if (!/^[a-zA-Z0-9]+$/.test(password)) {
+      setError("Password must only contain letters and numbers.");
+      return;
+    }
+
+    // Validate new password contains at least one letter
+    if (!/[a-zA-Z]/.test(password)) {
+      setError("Password must contain at least one letter.");
+      return;
+    }
+
+    // Validate new password contains at least one number
+    if (!/[0-9]/.test(password)) {
+      setError("Password must contain at least one number.");
       return;
     }
 
@@ -97,27 +130,35 @@ const ProfileEditCom = () => {
       return;
     }
 
-    // If everything is valid, clear the error and proceed
+    // If everything is valid, proceed with changing the password
+    changePassword(userEmail, oldPassword, password)
+      .then((result) => {
+        if (result === true) {
+          toast.success("Password changed successfully.");
 
-    if (password !== oldPassword && password === confirmPassword) {
-      profileNameChange(email, firstName, lastName)
-        .then((result) => {
-          if (result === true) {
-            toast.success("Password changed successfully");
-          } else {
-            toast.error("Error changing password");
-          }
-        })
-        .catch((error) => {
-          toast.error(error.message);
-        });
-    }
+          // Clear the form inputs
+          setPassword("");
+          setConfirmPassword("");
+          setOldPassword("");
+
+          // Optionally log out the user
+          setTimeout(() => {
+            logOut();
+          }, 2000);
+        } else {
+          toast.error("Failed to change password.");
+        }
+      })
+      .catch((error) => {
+        setError("Error changing password. Please try again.");
+        console.error(error); // Log error for debugging
+      });
   };
 
-  const editFromSubmit = (e) => {
+  const handelEditProfileName = (e) => {
     e.preventDefault();
 
-    const validation = (firstName, lastName, email) => {
+    const validation = (firstName, lastName, userEmail) => {
       if (firstName === "") {
         toast.error("First name is required");
         return false;
@@ -134,7 +175,7 @@ const ProfileEditCom = () => {
     };
 
     if (validation(firstName, lastName)) {
-      profileNameChange(email, firstName, lastName);
+      profileNameChange(userEmail, firstName, lastName);
 
       window.location.reload("/profileEdit");
 
@@ -150,7 +191,7 @@ const ProfileEditCom = () => {
   return (
     <div>
       <img src="" className="w-24 h-24 rounded-full" alt="" />
-      <h1>Edit Profile</h1>
+      <h1>Edit Picture</h1>
       <form action="">
         <label htmlFor="profilePicture">Profile Picture</label>
         <input
@@ -164,22 +205,21 @@ const ProfileEditCom = () => {
       <h1>Edit Password</h1>
       <form
         className="w-[300px] px-8 pt-6 pb-8 mb-4 bg-white rounded shadow-md"
-        onSubmit={handleSubmit}
+        onSubmit={handlePassChange}
       >
         <label>Old Password:</label>
         <div className="relative mb-[20px] w-[100%]">
           <input
             className="rounded-sm outline outline-1 outline-blue-500"
-            type={passwordVisible ? "text" : "password"}
+            type={OldpasswordVisible ? "text" : "password"}
             value={oldPassword}
             onChange={handelOldPasswordChange}
             onCopy={handleCopy}
-            
           />
 
           <div className="absolute top-[50%] right-[5%] translate-y-[-50%]">
-            <span onClick={togglePasswordVisibility} className="">
-              {passwordVisible ? <FaEye /> : <FaEyeSlash />}
+            <span onClick={toggleOldPasswordVisibility} className="">
+              {OldpasswordVisible ? <FaEye /> : <FaEyeSlash />}
             </span>
           </div>
         </div>
@@ -192,7 +232,6 @@ const ProfileEditCom = () => {
             value={password}
             onChange={handlePasswordChange}
             onCopy={handleCopy}
-            
           />
 
           <div className="absolute top-[50%] right-[5%] translate-y-[-50%]">
@@ -210,7 +249,6 @@ const ProfileEditCom = () => {
             value={confirmPassword}
             onChange={handleConfirmPasswordChange}
             onCopy={handleCopy}
-            
           />
           <div className="absolute top-[50%] right-[5%] translate-y-[-50%]">
             <span onClick={toggleConfirmPasswordVisibility} className="">
@@ -231,7 +269,7 @@ const ProfileEditCom = () => {
       </form>
 
       <h1>Edit Profile</h1>
-      <form action="" onSubmit={editFromSubmit}>
+      <form action="" onSubmit={handelEditProfileName}>
         {/* <label htmlFor="profilePicture">Profile Picture</label>
         <input
           type="file"
