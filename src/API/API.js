@@ -173,6 +173,7 @@ export function profileView() {
     .then((response) => {
       if (response.status === 200) {
         store.dispatch(setProfileDetails(response.data.data));
+        setUserDetails(response.data.data);
         return true;
       } else {
         toast.error("Something is Error");
@@ -240,7 +241,7 @@ export function changePassword(email, oldPassword, newPassword) {
         }
       } else {
         toast.error("An unexpected error occurred");
-        return false;  // Added return here
+        return false; // Added return here
       }
     })
     .catch((error) => {
@@ -249,8 +250,37 @@ export function changePassword(email, oldPassword, newPassword) {
       } else {
         toast.error(`Error: ${error.message}`);
       }
-      return false;  // Added return here
+      return false; // Added return here
     });
 }
 
-
+export function profilePictureChange(email, profilePic) {
+  const url = `${baseURL}/profilePictureChange`;
+  const body = {
+    email: email,
+    ProfilePic: profilePic,
+  };
+  return axios
+    .post(url, body)
+    .then((response) => {
+      if (response.status === 200) {
+        if (response.data.status === "fail") {
+          toast.error("Failed to Update");
+          return false;
+        } else {
+          toast.success("Profile Updated");
+          setUserDetails(response.data.data);
+          return true;
+        }
+      } else {
+        toast.error("Something is Error");
+      }
+    })
+    .catch((error) => {
+      if (error.response && error.response.status === 401) {
+        toast.error("Unauthorized request");
+      } else {
+        toast.error(`Error: ${error.message}`);
+      }
+    });
+}

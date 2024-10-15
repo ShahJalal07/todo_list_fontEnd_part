@@ -6,6 +6,7 @@ import { Link, NavLink } from "react-router-dom";
 import { FaHome } from "react-icons/fa";
 import { IoIosCreate } from "react-icons/io";
 import { getUserDetails, logOut } from "../helper/SessionHelper";
+import { useSelector } from "react-redux";
 const MainLayOut = (props) => {
   const [show, setShow] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -14,6 +15,7 @@ const MainLayOut = (props) => {
   const [isFocused, setIsFocused] = useState(false);
 
   const [active, setActive] = useState(false);
+  const profile = useSelector((state) => state.profile.profile);
 
   // Event handlers for focus and blur events
   const handleFocus = () => setIsFocused(true);

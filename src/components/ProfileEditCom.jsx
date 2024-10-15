@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { changePassword, profileNameChange, profileView } from "../API/API";
+import {
+  changePassword,
+  profileNameChange,
+  profilePictureChange,
+  profileView,
+} from "../API/API";
 import { toast } from "react-toastify";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { getUserDetails, logOut } from "../helper/SessionHelper";
@@ -10,6 +15,7 @@ const ProfileEditCom = () => {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [profilePicture, setProfilePicture] = useState();
+  const [previewPicture, setPreviewPicture] = useState();
 
   // Fetch profile from Redux statec
   const profile = useSelector((state) => state.profile.profile);
@@ -184,20 +190,53 @@ const ProfileEditCom = () => {
   };
 
   // Handle profile picture selection
-  const handleProfilePictureChange = (e) => {
-    setProfilePicture(e.target.files[0]);
+
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  };
+  
+  const handleProfilePictureChange =  (e) => {
+    const file = e.target.files[0];
+    // convertToBase64(file).then((result) => {
+    //   setPreviewPicture(result);
+    // });
+    setPreviewPicture(URL.createObjectURL(file));
+  };
+
+  const handleProfilePictureSubmit = (e) => {
+    e.preventDefault();
+    profilePictureChange(userEmail, previewPicture);
+    window.location.reload("/profileEdit");
   };
 
   return (
     <div>
-      <img src="" className="w-24 h-24 rounded-full" alt="" />
+      <img
+        src={previewPicture ? previewPicture : profile.photo}
+        className="object-cover w-24 h-24 overflow-hidden rounded-full"
+        alt=""
+      />
       <h1>Edit Picture</h1>
-      <form action="">
+      <form
+        onSubmit={handleProfilePictureSubmit}
+        className="w-[300px] px-8 pt-6 pb-8 mb-4 bg-white rounded shadow-md"
+        action=""
+      >
         <label htmlFor="profilePicture">Profile Picture</label>
         <input
           type="file"
           id="profilePicture"
           onChange={handleProfilePictureChange}
+          value={profilePicture}
         />
         <button type="submit">Submit</button>
       </form>
@@ -270,13 +309,6 @@ const ProfileEditCom = () => {
 
       <h1>Edit Profile</h1>
       <form action="" onSubmit={handelEditProfileName}>
-        {/* <label htmlFor="profilePicture">Profile Picture</label>
-        <input
-          type="file"
-          id="profilePicture"
-          onChange={handleProfilePictureChange}
-        /> */}
-
         <label htmlFor="firstName">First Name</label>
         <input
           type="text"
