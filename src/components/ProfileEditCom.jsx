@@ -206,10 +206,11 @@ const ProfileEditCom = () => {
   
   const handleProfilePictureChange =  (e) => {
     const file = e.target.files[0];
-    // convertToBase64(file).then((result) => {
-    //   setPreviewPicture(result);
-    // });
-    setPreviewPicture(URL.createObjectURL(file));
+    convertToBase64(file)
+    .then((result) => {
+      setPreviewPicture(result);
+    });
+    // setPreviewPicture(URL.createObjectURL(file));
   };
 
   const handleProfilePictureSubmit = (e) => {

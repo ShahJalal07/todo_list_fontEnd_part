@@ -15,7 +15,7 @@ const baseURL = "http://localhost:8000/api/v1";
 
 const token = { headers: { token: getAuthToken() } };
 
-// registration request start
+// ========= registration request start =====
 export async function registrationRequest(
   firstName,
   lastName,
@@ -64,9 +64,9 @@ export async function registrationRequest(
       return false;
     });
 }
-// registration request end
+// ======== registration request end =======
 
-// login request start
+// ========= login request start =====
 export function loginRequest(email, password) {
   const url = `${baseURL}/login`;
 
@@ -98,9 +98,9 @@ export function loginRequest(email, password) {
       return false;
     });
 }
-// login request end
+// ========= login request end =========
 
-// email verify start
+// ======== email verify start =========
 export function verifyEmailRequest(email) {
   const url = `${baseURL}/email-verify/${email}`;
   return axios.get(url).then((response) => {
@@ -118,9 +118,9 @@ export function verifyEmailRequest(email) {
     }
   });
 }
-// email verify end
+// ========= email verify end =========
 
-// otp verify start
+// ======== otp verify start =========
 export function otpVerifyRequest(email, otp, status) {
   const url = `${baseURL}/otp-verify/${email}/${otp}/${status}`;
   return axios.get(url).then((response) => {
@@ -138,9 +138,9 @@ export function otpVerifyRequest(email, otp, status) {
     }
   });
 }
-// otp verify end
+// ========= otp verify end =========
 
-// reset password start
+// ========= reset password start =========
 export function resetPasswordRequest(email, otp, newPassword) {
   const url = `${baseURL}/reset-password`;
 
@@ -164,8 +164,9 @@ export function resetPasswordRequest(email, otp, newPassword) {
     }
   });
 }
-// reset password end
+// ========= reset password end =========
 
+// ========= profile view start =========
 export function profileView() {
   const url = `${baseURL}/profile-view`;
   return axios
@@ -188,7 +189,9 @@ export function profileView() {
       }
     });
 }
+// ========= profile view end =========
 
+// ========= profile name start =========
 export function profileNameChange(email, firstName, lastName) {
   const url = `${baseURL}/profileNameChange`;
   const body = {
@@ -219,7 +222,9 @@ export function profileNameChange(email, firstName, lastName) {
       }
     });
 }
+// ========= profile name end =========
 
+// ========= profile password start =========
 export function changePassword(email, oldPassword, newPassword) {
   const url = `${baseURL}/changePassword`;
   const body = {
@@ -253,7 +258,9 @@ export function changePassword(email, oldPassword, newPassword) {
       return false; // Added return here
     });
 }
+// ========= profile password end =========
 
+// ========= profile picture change start =========
 export function profilePictureChange(email, profilePic) {
   const url = `${baseURL}/profilePictureChange`;
   const body = {
@@ -284,3 +291,37 @@ export function profilePictureChange(email, profilePic) {
       }
     });
 }
+// ========= profile picture change end =========
+
+// ========= create todo start  =========
+export function createTodoRequest(title, description) {
+
+  const url = `${baseURL}/addTask`;
+  const postBody = {
+    title: title,
+    description: description,
+    status: "new",
+  };
+
+  return axios
+    .post(url, postBody, token)
+    .then((response) => {
+      if (response.status === 200) {
+        if (response.data.status === "fail") {
+          toast.error("Failed to Update");
+          return false;
+        } else {
+          toast.success("Todo created successfully");
+          return true;
+        }
+      } else {
+        toast.error("Something is Error");
+      }
+    })
+    .catch((error) => {
+      toast.error(`Error: ${error.message}`);
+    });
+
+    
+}
+// ========= create todo end  =========
